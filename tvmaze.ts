@@ -61,7 +61,7 @@ async function getShowsByTerm(term: string): Promise<ShowInterface[]> {
 
 /** Given list of shows, create markup for each and append to DOM */
 
-function populateShows(shows: ShowInterface[]) {
+function populateShows(shows: ShowInterface[]): void {
   $showsList.empty();
 
   for (let show of shows) {
@@ -105,7 +105,7 @@ $searchForm.on("submit", async function (evt) {
   await searchForShowAndDisplay();
 });
 
-//TODO: jquery for episodes button to handle click?
+
 
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
@@ -116,14 +116,15 @@ async function getEpisodesOfShow(id: number): Promise<EpisodeInterface[]> {
     `https://api.tvmaze.com/shows/${id}/episodes`,
   );
 
-  const show = response.data;
+  // const show = response.data;
+  console.log("response.data ", response.data)
 
-  return response.data.map((episode: { episode: EpisodeInterface; }) => {
+  return response.data.map((episode: EpisodeInterface) => {
     return {
-      id: show.id,
-      name: show.name,
-      season: show.season,
-      number: show.number.medium
+      id: episode.id,
+      name: episode.name,
+      season: episode.season,
+      number: episode.number
     };
   }
   );
@@ -137,20 +138,24 @@ function populateEpisodes(episodes: EpisodeInterface[]) {
 
   for (let episode of episodes) {
     const $episode = $(
-      `<div data-episode-id="${episode.id}" class="Episode col-md-12 col-lg-6 mb-4">
-         <div class="media">
-           <div class="media-body">
-             <h5 class="text-primary">${episode.name}</h5>
-             <div><small>${episode.season}</small></div>
-             <div><small>${episode.number}</small></div>
-             <button class="btn btn-outline-light btn-sm Episode-getEpisodes">
-               Episodes
-             </button>
-           </div>
-         </div>
-       </div>
-      `);
+      `<li>${episode.name} (Season ${episode.season}, Number ${episode.number})</li>`);
 
     $episodesArea.append($episode);
   }
 }
+
+async function getEpisodesAndDisplay(evt: Event) {
+  evt.preventDefault();
+  console.log(evt)
+  const episodes: EpisodeInterface[] = await getEpisodesOfShow(139);
+
+  $episodesArea.show();
+  populateEpisodes(episodes);
+}
+
+$('#showsList').on('click', "button", getEpisodesAndDisplay)
+
+// $searchForm.on("submit", async function (evt) {
+//   evt.preventDefault();
+//   await searchForShowAndDisplay();
+// });

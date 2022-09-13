@@ -12855,25 +12855,25 @@ $searchForm.on("submit", function (evt) {
         });
     });
 });
-//TODO: jquery for episodes button to handle click?
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
 function getEpisodesOfShow(id) {
     return __awaiter(this, void 0, void 0, function () {
-        var response, show;
+        var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, axios_1.default.get("https://api.tvmaze.com/shows/".concat(id, "/episodes"))];
                 case 1:
                     response = _a.sent();
-                    show = response.data;
+                    // const show = response.data;
+                    console.log("response.data ", response.data);
                     return [2 /*return*/, response.data.map(function (episode) {
                             return {
-                                id: show.id,
-                                name: show.name,
-                                season: show.season,
-                                number: show.number.medium
+                                id: episode.id,
+                                name: episode.name,
+                                season: episode.season,
+                                number: episode.number
                             };
                         })];
             }
@@ -12885,10 +12885,33 @@ function populateEpisodes(episodes) {
     $episodesArea.empty();
     for (var _i = 0, episodes_1 = episodes; _i < episodes_1.length; _i++) {
         var episode = episodes_1[_i];
-        var $episode = $("<div data-episode-id=\"".concat(episode.id, "\" class=\"Episode col-md-12 col-lg-6 mb-4\">\n         <div class=\"media\">\n           <div class=\"media-body\">\n             <h5 class=\"text-primary\">").concat(episode.name, "</h5>\n             <div><small>").concat(episode.season, "</small></div>\n             <div><small>").concat(episode.number, "</small></div>\n             <button class=\"btn btn-outline-light btn-sm Episode-getEpisodes\">\n               Episodes\n             </button>\n           </div>\n         </div>\n       </div>\n      "));
+        var $episode = $("<li>".concat(episode.name, " (Season ").concat(episode.season, ", Number ").concat(episode.number, ")</li>"));
         $episodesArea.append($episode);
     }
 }
+function getEpisodesAndDisplay(evt) {
+    return __awaiter(this, void 0, void 0, function () {
+        var episodes;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    evt.preventDefault();
+                    console.log(evt);
+                    return [4 /*yield*/, getEpisodesOfShow(139)];
+                case 1:
+                    episodes = _a.sent();
+                    $episodesArea.show();
+                    populateEpisodes(episodes);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+$('#showsList').on('click', "button", getEpisodesAndDisplay);
+// $searchForm.on("submit", async function (evt) {
+//   evt.preventDefault();
+//   await searchForShowAndDisplay();
+// });
 
 
 /***/ })
